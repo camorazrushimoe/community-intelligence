@@ -1,0 +1,17 @@
+schema: spec-driven
+
+context: |
+  Project: Community Intelligence — market intelligence for the video-game industry,
+  built from player voice (Reddit + Steam) structured into a graph of signals.
+
+  Tech stack: Python 3.13, FastAPI, PostgreSQL, Neo4j, Docker.
+  LLM for signal processing: DeepSeek-V3 (structured JSON output).
+  Name matching: name_variants[] + optional embeddings (text-embedding).
+  Data sources: Steam storefront / appreviews API; Reddit via Arctic Shift API.
+  Conventions: REST JSON API; pytest for tests; code and docs in English.
+
+rules:
+  specs:
+    - Use WHEN/THEN (Given/When/Then) format for scenarios.
+  design:
+    - Include a data-flow diagram for cross-cutting flows.
