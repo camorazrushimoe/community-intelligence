@@ -42,3 +42,23 @@ item (CI-1…CI-6):
 
 Python 3.13 · FastAPI · PostgreSQL · Neo4j · Docker · **DeepSeek-V3 (LLM)** ·
 Arctic Shift (Reddit) · Steam storefront / appreviews APIs.
+
+## Development
+
+```bash
+# 1. Create a virtualenv and install dependencies (Python 3.13)
+uv venv .venv
+uv pip install --python .venv/bin/python "psycopg[binary]>=3.2" "pytest>=8.3"
+
+# 2. Apply migrations (reads DEV_POSTGRES_URL)
+.venv/bin/python -m catalog.migrate
+
+# 3. Seed the catalog (10-20 games, idempotent)
+.venv/bin/python -m catalog.seed
+
+# 4. Run tests
+.venv/bin/python -m pytest
+```
+
+The database connection comes from the `DEV_POSTGRES_URL` environment variable.
+Integration tests skip automatically when the database is unavailable.
