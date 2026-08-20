@@ -23,5 +23,7 @@ htmlcov/
 .vscode/
 .DS_Store
 
-# Environment — real secrets (copy .env.example to .env, never commit)
+# Secrets
 .env
+.env.*
+!.env.example
