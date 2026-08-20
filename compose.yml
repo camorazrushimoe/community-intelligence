@@ -1,0 +1,102 @@
+name: community-intelligence
+
+# Community Intelligence — project-level services.
+# Runs on the foundation's generic dev-env / staging-env networks.
+# Data persists in the named volumes migrated from the old foundation clusters.
+
+services:
+  postgres-dev:
+    image: postgres:16-alpine
+    container_name: ci-postgres-dev
+    restart: unless-stopped
+    networks: [dev-env]
+    environment:
+      POSTGRES_USER: dev
+      POSTGRES_PASSWORD: ${DEV_POSTGRES_PASSWORD:-devpass123}
+      POSTGRES_DB: dev
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres-dev-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dev -d dev"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  postgres-staging:
+    image: postgres:16-alpine
+    container_name: ci-postgres-staging
+    restart: unless-stopped
+    networks: [staging-env]
+    environment:
+      POSTGRES_USER: staging
+      POSTGRES_PASSWORD: ${STAGING_POSTGRES_PASSWORD:-stagingpass}
+      POSTGRES_DB: staging
+    ports:
+      - "5434:5432"
+    volumes:
+      - postgres-staging-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U staging -d staging"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  neo4j-dev:
+    image: neo4j:5
+    container_name: ci-neo4j-dev
+    restart: unless-stopped
+    networks: [dev-env]
+    environment:
+      NEO4J_AUTH: neo4j/${DEV_NEO4J_PASSWORD:-devpass123}
+    ports:
+      - "7475:7474"   # HTTP
+      - "7688:7687"   # Bolt
+    volumes:
+      - neo4j-dev-data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c 'echo > /dev/tcp/localhost/7687' 2>/dev/null || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  neo4j-staging:
+    image: neo4j:5
+    container_name: ci-neo4j-staging
+    restart: unless-stopped
+    networks: [staging-env]
+    environment:
+      NEO4J_AUTH: neo4j/${STAGING_NEO4J_PASSWORD:-stagingpass}
+    ports:
+      - "7476:7474"   # HTTP
+      - "7689:7687"   # Bolt
+    volumes:
+      - neo4j-staging-data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c 'echo > /dev/tcp/localhost/7687' 2>/dev/null || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+networks:
+  dev-env:
+    external: true
+    name: dev-crew-dev-env
+  staging-env:
+    external: true
+    name: dev-crew-staging-env
+
+volumes:
+  postgres-dev-data:
+    external: true
+    name: dev-crew_postgres-dev-data
+  postgres-staging-data:
+    external: true
+    name: dev-crew_postgres-staging-data
+  neo4j-dev-data:
+    external: true
+    name: dev-crew_neo4j-dev-data
+  neo4j-staging-data:
+    external: true
+    name: dev-crew_neo4j-staging-data
